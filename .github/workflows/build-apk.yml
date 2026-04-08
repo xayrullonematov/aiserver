@@ -19,13 +19,15 @@ jobs:
           channel: 'stable'
 
       - name: Get dependencies
+        working-directory: ./flutter-app
         run: flutter pub get
 
       - name: Build APK
+        working-directory: ./flutter-app
         run: flutter build apk --release --split-per-abi
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: apks
-          path: build/app/outputs/flutter-apk/*.apk
+          path: flutter-app/build/app/outputs/flutter-apk/*.apk
