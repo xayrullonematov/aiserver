@@ -1,0 +1,54 @@
+/home/botuser/app
+├── alembic.ini
+├── app
+│   ├── api
+│   │   ├── ai.py
+│   │   ├── auth.py
+│   │   ├── files.py
+│   │   ├── __init__.py
+│   │   ├── servers.py
+│   │   ├── ssh.py
+│   │   └── ws.py
+│   ├── core
+│   │   ├── config.py
+│   │   ├── deps.py
+│   │   ├── __init__.py
+│   │   └── security.py
+│   ├── db
+│   │   ├── __init__.py
+│   │   └── session.py
+│   ├── main.py
+│   ├── models
+│   │   ├── execution.py
+│   │   ├── __init__.py
+│   │   ├── server.py
+│   │   ├── session.py
+│   │   └── user.py
+│   ├── schemas
+│   │   ├── ai.py
+│   │   ├── __init__.py
+│   │   ├── server.py
+│   │   ├── ssh.py
+│   │   ├── token.py
+│   │   └── user.py
+│   └── services
+│       ├── ai_proxy.py
+│       ├── command_safety.py
+│       ├── context_packager.py
+│       ├── file_manager.py
+│       ├── __init__.py
+│       └── ssh_manager.py
+├── docker-compose.yml
+├── Dockerfile
+├── GEMINI.md
+├── migrations
+│   ├── env.py
+│   ├── README
+│   ├── script.py.mako
+│   └── versions
+│       └── 551033dc5100_initial_migration.py
+├── requirements.txt
+├── test_syntax.py
+└── tree.txt
+
+10 directories, 42 files
