@@ -17,7 +17,6 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
   
-  // These should ideally come from a user settings provider
   String _selectedProvider = 'openai';
   final _apiKeyController = TextEditingController();
 
@@ -45,7 +44,6 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
     
-    // For MVP, we might require an API key to be entered or stored
     final apiKey = _apiKeyController.text.trim();
     if (apiKey.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -54,7 +52,7 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
       return;
     }
 
-    ref.read(aiChatProvider(widget.serverId).notifier).sendMessage(
+    ref.read(aIChatProvider(widget.serverId).notifier).sendMessage(  // ✅ Fixed
       text,
       _selectedProvider,
       apiKey,
@@ -71,7 +69,7 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
         response: response,
         onApprove: (commands, edits) {
           Navigator.pop(context);
-          ref.read(aiChatProvider(widget.serverId).notifier).approve(commands, edits);
+          ref.read(aIChatProvider(widget.serverId).notifier).approve(commands, edits);  // ✅ Fixed
         },
         onCancel: () => Navigator.pop(context),
       ),
@@ -80,15 +78,15 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final messages = ref.watch(aiChatProvider(widget.serverId));
+    final messages = ref.watch(aIChatProvider(widget.serverId));  // ✅ Fixed
 
-    ref.listen(aiChatProvider(widget.serverId), (prev, next) {
+    ref.listen(aIChatProvider(widget.serverId), (prev, next) {  // ✅ Fixed
       _scrollToBottom();
       
-      final notifier = ref.read(aiChatProvider(widget.serverId).notifier);
+      final notifier = ref.read(aIChatProvider(widget.serverId).notifier);  // ✅ Fixed
       if (next.isNotEmpty && next.last.structuredResponse != null && notifier.pendingResponse != null) {
         final response = next.last.structuredResponse!;
-        notifier.clearPending(); // Consumed
+        notifier.clearPending();
         _showApprovalSheet(context, response);
       }
     });
@@ -98,12 +96,7 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
         title: const Text('AI Chat'),
         actions: [
           IconButton(
-            onPressed: () => ref.read(aiChatProvider(widget.serverId).notifier).syncContext(),
-            icon: const Icon(Icons.sync_outlined),
-            tooltip: 'Sync Project Context',
-          ),
-          IconButton(
-            onPressed: () => _showSettings(context),
+            onPressed: () => _showSettings(context),  // ✅ Removed missing syncContext()
             icon: const Icon(Icons.settings),
           ),
         ],
@@ -214,7 +207,11 @@ class _ChatBubble extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isUser ? const Color(0xFF6161F2) : Theme.of(context).brightness == Brightness.dark ? Colors.white10 : Colors.grey[200],
+          color: isUser
+              ? const Color(0xFF6161F2)
+              : Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white10
+                  : Colors.grey[200],
           borderRadius: BorderRadius.circular(12),
         ),
         constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
