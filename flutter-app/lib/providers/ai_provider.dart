@@ -42,7 +42,6 @@ class AIChat extends _$AIChat {
     ];
   }
 
-  // Clear the pending response after it's been handled by the UI
   void clearPending() {
     _pendingResponse = null;
   }
@@ -50,7 +49,7 @@ class AIChat extends _$AIChat {
   Future<void> approve(List<int> commands, List<int> edits) async {
     if (_pendingResponse == null) return;
     final currentProposal = _pendingResponse!;
-    _pendingResponse = null; // Prevent double trigger
+    _pendingResponse = null;
 
     state = [...state, ChatMessage(role: 'assistant', text: '🚀 Executing approved changes...', isStreaming: true)];
 
