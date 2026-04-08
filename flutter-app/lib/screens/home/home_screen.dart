@@ -48,7 +48,7 @@ class HomeScreen extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   final server = servers[index];
                   return ListTile(
-                    leading: const Icon(Icons.server),
+                    leading: const Icon(Icons.dns_outlined), // ✅ Fixed: Icons.server doesn't exist
                     title: Text(server.displayName),
                     subtitle: Text('${server.username}@${server.host}:${server.port}'),
                     trailing: IconButton(
@@ -76,7 +76,10 @@ class HomeScreen extends ConsumerWidget {
         title: const Text('Delete Server'),
         content: Text('Are you sure you want to delete ${server.displayName}?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
           TextButton(
             onPressed: () {
               ref.read(serversProvider.notifier).deleteServer(server.id);
