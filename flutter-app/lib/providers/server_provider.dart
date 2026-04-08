@@ -64,8 +64,8 @@ class Servers extends _$Servers {
 
 @riverpod
 Stream<Map<String, double>> serverMetrics(ServerMetricsRef ref, String serverId) async* {
-  final service = ref.watch(sshServiceProvider);
-  
+  final service = ref.watch(serverServiceProvider); // ✅ Fixed: sshServiceProvider → serverServiceProvider
+
   while (true) {
     try {
       final metrics = await service.getMetrics(serverId);
@@ -74,7 +74,6 @@ Stream<Map<String, double>> serverMetrics(ServerMetricsRef ref, String serverId)
         'ram': (metrics['ram'] as num).toDouble(),
       };
     } catch (e) {
-      // If metrics fail, yield zeros or handle error
       yield {'cpu': 0.0, 'ram': 0.0};
     }
     await Future.delayed(const Duration(seconds: 5));
