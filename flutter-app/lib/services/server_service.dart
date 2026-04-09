@@ -3,7 +3,7 @@ import 'package:ai_server_copilot/providers/auth_provider.dart';
 import 'package:ai_server_copilot/services/server_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'server_provider.g.dart';
+part 'server_service.g.dart';
 
 @Riverpod(keepAlive: true)
 ServerService serverService(ServerServiceRef ref) {
