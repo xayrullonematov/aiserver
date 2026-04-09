@@ -6,12 +6,12 @@ class AIService {
   AIService(this._apiService);
 
   Future<List<String>> getProviders() async {
-    final response = await _apiService.dio.get('ai/providers/');
+    final response = await _apiService.dio.get('ai/providers');
     return List<String>.from(response.data);
   }
 
   Future<String> packageContext(String serverId) async {
-    final response = await _apiService.dio.post('ai/context/$serverId/');
+    final response = await _apiService.dio.post('ai/context/$serverId');
     return response.data['context'];
   }
 
@@ -22,7 +22,7 @@ class AIService {
   }) async {
     // Note: The actual chat streaming is often handled via WebSocket or a direct POST with streaming response.
     // For this implementation, we'll assume the /ai/chat endpoint returns a stream or we're using the WebSocket via WSService.
-    await _apiService.dio.post('ai/chat/', data: {
+    await _apiService.dio.post('ai/chat', data: {
       'provider': provider,
       'api_key': apiKey,
       'messages': messages,
