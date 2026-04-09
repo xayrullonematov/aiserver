@@ -9,7 +9,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'ai_provider.g.dart';
 
 @Riverpod(keepAlive: true)
-AIService aiService(AIServiceRef ref) {
+AIService aiService(AiServiceRef ref) {
   final api = ref.watch(apiServiceProvider);
   return AIService(api);
 }

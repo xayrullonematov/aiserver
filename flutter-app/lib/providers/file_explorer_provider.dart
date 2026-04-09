@@ -7,7 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'file_explorer_provider.g.dart';
 
 @Riverpod(keepAlive: true)
-SSHService sshService(SSHServiceRef ref) {
+SSHService sshService(SshServiceRef ref) {
   final api = ref.watch(apiServiceProvider);
   return SSHService(api);
 }

@@ -7,7 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'terminal_provider.g.dart';
 
 @Riverpod(keepAlive: true)
-WSService wsService(WSServiceRef ref) {
+WSService wsService(WsServiceRef ref) {
   return WSService();
 }
 
