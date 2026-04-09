@@ -7,7 +7,7 @@ class ServerService {
   ServerService(this._apiService);
 
   Future<List<ServerProfile>> getServers() async {
-    final response = await _apiService.dio.get('/servers');
+    final response = await _apiService.dio.get('/servers/');
     return (response.data as List)
         .map((e) => ServerProfile.fromJson(e))
         .toList();
@@ -22,7 +22,7 @@ class ServerService {
     required String passwordOrKey,
     required String projectPath,
   }) async {
-    await _apiService.dio.post('/servers', data: {
+    await _apiService.dio.post('/servers/', data: {
       'display_name': displayName,
       'host': host,
       'port': port,
@@ -34,11 +34,11 @@ class ServerService {
   }
 
   Future<void> deleteServer(String id) async {
-    await _apiService.dio.delete('/servers/$id');
+    await _apiService.dio.delete('/servers/$id/');
   }
 
   Future<Map<String, dynamic>> getMetrics(String serverId) async {
-    final response = await _apiService.dio.get('/servers/$serverId/metrics');
+    final response = await _apiService.dio.get('/servers/$serverId/metrics/');
     return response.data;
   }
 }

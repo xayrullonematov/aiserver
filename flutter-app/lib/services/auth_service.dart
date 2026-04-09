@@ -11,7 +11,7 @@ class AuthService {
 
   Future<User?> login(String email, String password) async {
     try {
-      final response = await _apiService.dio.post('/auth/login', data: {
+      final response = await _apiService.dio.post('/auth/login/', data: {
         'email': email,
         'password': password,
       });
@@ -27,7 +27,7 @@ class AuthService {
 
   Future<User?> register(String email, String password) async {
     try {
-      await _apiService.dio.post('/auth/register', data: {
+      await _apiService.dio.post('/auth/register/', data: {
         'email': email,
         'password': password,
       });
@@ -39,7 +39,7 @@ class AuthService {
 
   Future<User?> me() async {
     try {
-      final response = await _apiService.dio.get('/auth/me');
+      final response = await _apiService.dio.get('/auth/me/');
       return User.fromJson(response.data);
     } catch (e) {
       return null;

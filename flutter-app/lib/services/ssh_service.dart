@@ -6,15 +6,15 @@ class SSHService {
   SSHService(this._apiService);
 
   Future<void> connect(String serverId) async {
-    await _apiService.dio.post('/ssh/$serverId/connect');
+    await _apiService.dio.post('/ssh/$serverId/connect/');
   }
 
   Future<void> disconnect(String serverId) async {
-    await _apiService.dio.post('/ssh/$serverId/disconnect');
+    await _apiService.dio.post('/ssh/$serverId/disconnect/');
   }
 
   Future<void> execute(String serverId, String command, {bool approved = false}) async {
-    await _apiService.dio.post('/ssh/$serverId/execute', data: {
+    await _apiService.dio.post('/ssh/$serverId/execute/', data: {
       'command': command,
       'approved': approved,
     });
@@ -49,7 +49,7 @@ class SSHService {
   Future<Map<String, dynamic>> getMetrics(String serverId) async {
     // We'll execute a command to get CPU and RAM usage
     // For Linux: top -bn1 | grep "Cpu(s)" and free -m
-    final response = await _apiService.dio.post('/ssh/$serverId/execute', data: {
+    final response = await _apiService.dio.post('/ssh/$serverId/execute/', data: {
       'command': "top -bn1 | grep 'Cpu(s)' | awk '{print \$2}'; free -m | grep Mem | awk '{print \$3/\$2 * 100.0}'",
       'approved': true,
     });
@@ -64,7 +64,7 @@ class SSHService {
   }
 
   Future<List<dynamic>> getExecutionLogs(String serverId) async {
-    final response = await _apiService.dio.get('/servers/$serverId/logs');
+    final response = await _apiService.dio.get('/servers/$serverId/logs/');
     return response.data;
   }
 }
