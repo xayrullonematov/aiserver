@@ -1,30 +1,16 @@
+import 'package:ai_server_copilot/services/api_service.dart';
 import 'package:ai_server_copilot/models/server.dart';
-import 'package:ai_server_copilot/providers/auth_provider.dart';
-import 'package:ai_server_copilot/services/server_service.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'server_service.g.dart';
+class ServerService {
+  final ApiService _apiService;
 
-@Riverpod(keepAlive: true)
-ServerService serverService(ServerServiceRef ref) {
-  final api = ref.watch(apiServiceProvider);
-  return ServerService(api);
-}
+  ServerService(this._apiService);
 
-@riverpod
-class Servers extends _$Servers {
-  @override
-  FutureOr<List<ServerProfile>> build() async {
-    final service = ref.watch(serverServiceProvider);
-    return await service.getServers();
-  }
-
-  Future<void> refresh() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final service = ref.read(serverServiceProvider);
-      return await service.getServers();
-    });
+  Future<List<ServerProfile>> getServers() async {
+    final response = await _apiService.dio.get('/servers');
+    return (response.data as List)
+        .map((e) => ServerProfile.fromJson(e))
+        .toList();
   }
 
   Future<void> addServer({
@@ -36,46 +22,23 @@ class Servers extends _$Servers {
     required String passwordOrKey,
     required String projectPath,
   }) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final service = ref.read(serverServiceProvider);
-      await service.addServer(
-        displayName: displayName,
-        host: host,
-        port: port,
-        username: username,
-        authType: authType,
-        passwordOrKey: passwordOrKey,
-        projectPath: projectPath,
-      );
-      return await service.getServers();
+    await _apiService.dio.post('/servers', data: {
+      'display_name': displayName,
+      'host': host,
+      'port': port,
+      'username': username,
+      'auth_type': authType,
+      'encrypted_credentials': passwordOrKey,
+      'project_path': projectPath,
     });
   }
 
   Future<void> deleteServer(String id) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final service = ref.read(serverServiceProvider);
-      await service.deleteServer(id);
-      return await service.getServers();
-    });
+    await _apiService.dio.delete('/servers/$id');
   }
-}
 
-@riverpod
-Stream<Map<String, double>> serverMetrics(ServerMetricsRef ref, String serverId) async* {
-  final api = ref.watch(apiServiceProvider); // ✅ Fixed: use apiServiceProvider directly
-
-  while (true) {
-    try {
-      final response = await api.dio.get('/servers/$serverId/metrics'); // ✅ Fixed: direct API call
-      yield {
-        'cpu': (response.data['cpu'] as num).toDouble(),
-        'ram': (response.data['ram'] as num).toDouble(),
-      };
-    } catch (e) {
-      yield {'cpu': 0.0, 'ram': 0.0};
-    }
-    await Future.delayed(const Duration(seconds: 5));
+  Future<Map<String, dynamic>> getMetrics(String serverId) async {
+    final response = await _apiService.dio.get('/servers/$serverId/metrics');
+    return response.data;
   }
 }

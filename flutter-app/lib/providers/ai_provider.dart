@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:ai_server_copilot/providers/auth_provider.dart';
 import 'package:ai_server_copilot/providers/terminal_provider.dart';
+import 'package:ai_server_copilot/services/api_service.dart';
 import 'package:ai_server_copilot/services/ai_service.dart';
 import 'package:ai_server_copilot/models/ai_response.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
