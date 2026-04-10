@@ -27,13 +27,9 @@ class AuthService {
     try {
       final response = await _apiService.dio.post(
         'auth/login',
-        data: {
-          'email': email,
-          'password': password,
-        },
+        data: {'email': email, 'password': password},
         options: Options(extra: {'skipAuth': true}),
       );
-
       await _storageService.saveTokens(
         accessToken: response.data['access_token'] as String,
         refreshToken: response.data['refresh_token'] as String,
@@ -49,13 +45,9 @@ class AuthService {
     try {
       final response = await _apiService.dio.post(
         'auth/register',
-        data: {
-          'email': email,
-          'password': password,
-        },
+        data: {'email': email, 'password': password},
         options: Options(extra: {'skipAuth': true}),
       );
-
       await _storageService.saveTokens(
         accessToken: response.data['access_token'] as String,
         refreshToken: response.data['refresh_token'] as String,
@@ -67,17 +59,24 @@ class AuthService {
     }
   }
 
+  /// Silently loads the current user on app startup.
+  /// Returns null instead of throwing — any error means "not logged in".
   Future<User?> loadCurrentUser() async {
+    final token = await _storageService.getAccessToken();
+    if (token == null || token.isEmpty) return null;
+
     try {
       return await me();
     } on DioException catch (e) {
+      // 401/403 = token invalid/expired (refresh may have already been attempted by interceptor)
       if (e.response?.statusCode == 401 || e.response?.statusCode == 403) {
         await _storageService.deleteTokens();
         return null;
       }
-      throw AuthException(_errorMessage(e, fallback: 'Unable to load current user'));
-    } catch (e) {
-      throw AuthException(_errorMessage(e, fallback: 'Unable to load current user'));
+      // Network error, server down, etc. — treat as "not logged in" silently
+      return null;
+    } catch (_) {
+      return null;
     }
   }
 
