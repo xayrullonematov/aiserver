@@ -1,0 +1,50 @@
+modules = ["python-3.12"]
+[agent]
+expertMode = true
+
+[nix]
+channel = "stable-25_05"
+packages = ["cargo", "libiconv", "libsodium", "libxcrypt", "nettle", "openssh", "openssl", "pkg-config", "postgresql", "rustc"]
+
+[userenv]
+
+[userenv.shared]
+SECRET_KEY = "6b333aed3a2354eef2c622778c43280d8a7870d43b466b4ced12a8ddcb6aa2fa"
+ENCRYPTION_KEY = "jKRCPr3w/4jfzmrpaj7nmDdkhqq5AFXgBfDr7XnoIYM="
+ALLOWED_ORIGINS = "http://localhost:3000,http://localhost:5000"
+DEBUG = "true"
+ENVIRONMENT = "local"
+ACCESS_TOKEN_EXPIRE_MINUTES = "15"
+REFRESH_TOKEN_EXPIRE_DAYS = "30"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "uvicorn app.main:app --host 0.0.0.0 --port 5000 --reload"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[deployment]
+deploymentTarget = "vm"
+run = ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5000", "--workers", "1"]

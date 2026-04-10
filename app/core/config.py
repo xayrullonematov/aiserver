@@ -5,7 +5,6 @@ from typing import Annotated, Any, Literal, Optional
 from pydantic import (
     AnyHttpUrl,
     BeforeValidator,
-    PostgresDsn,
     computed_field,
     model_validator,
 )
@@ -18,6 +17,23 @@ def parse_cors(v: Any) -> list[str] | str:
     elif isinstance(v, list | str):
         return v
     raise ValueError(v)
+
+
+def parse_database_url(v: Any) -> str:
+    if isinstance(v, str):
+        from urllib.parse import urlparse, urlunparse, urlencode, parse_qs
+        url = v
+        if url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        parsed = urlparse(url)
+        params = parse_qs(parsed.query, keep_blank_values=True)
+        params.pop("sslmode", None)
+        new_query = urlencode({k: v[0] for k, v in params.items()})
+        parsed = parsed._replace(query=new_query)
+        return urlunparse(parsed)
+    return str(v)
 
 
 class Settings(BaseSettings):
@@ -43,8 +59,8 @@ class Settings(BaseSettings):
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
     DEBUG: bool = False
 
-    # Database
-    DATABASE_URL: PostgresDsn
+    # Database - accepts both postgresql:// and postgresql+asyncpg:// formats
+    DATABASE_URL: Annotated[str, BeforeValidator(parse_database_url)]
     
     # CORS
     ALLOWED_ORIGINS: Annotated[
