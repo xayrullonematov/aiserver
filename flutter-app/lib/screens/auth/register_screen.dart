@@ -13,6 +13,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -21,18 +22,41 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
+  Future<void> _submit() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
 
-    ref.listen(authProvider, (previous, next) {
-      if (next.hasValue && next.value != null) {
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter email and password')),
+      );
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      await ref.read(authProvider.notifier).register(email, password);
+      final authState = ref.read(authProvider);
+      if (authState.hasValue && authState.value != null && mounted) {
         context.go('/');
       }
-      if (next.hasError) {
+    } catch (e) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.error.toString())),
+          SnackBar(content: Text(e.toString())),
         );
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen(authProvider, (previous, next) {
+      if (next.hasValue && next.value != null && mounted) {
+        context.go('/');
       }
     });
 
@@ -50,6 +74,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.emailAddress,
+              autocorrect: false,
+              textInputAction: TextInputAction.next,
             ),
             const SizedBox(height: 16),
             TextField(
@@ -59,20 +85,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 border: OutlineInputBorder(),
               ),
               obscureText: true,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => _submit(),
             ),
             const SizedBox(height: 24),
             SizedBox(
               height: 56,
               child: ElevatedButton(
-                onPressed: authState.isLoading
-                    ? null
-                    : () {
-                        ref.read(authProvider.notifier).register(
-                              _emailController.text,
-                              _passwordController.text,
-                            );
-                      },
-                child: authState.isLoading
+                onPressed: _isSubmitting ? null : _submit,
+                child: _isSubmitting
                     ? const CircularProgressIndicator()
                     : const Text('Register'),
               ),
