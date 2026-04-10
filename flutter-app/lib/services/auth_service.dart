@@ -38,7 +38,7 @@ class AuthService {
         accessToken: response.data['access_token'] as String,
         refreshToken: response.data['refresh_token'] as String,
       );
-      return await me();
+      return User.fromJson(Map<String, dynamic>.from(response.data['user'] as Map));
     } catch (e) {
       await _storageService.deleteTokens();
       throw AuthException(_errorMessage(e, fallback: 'Login failed'));
@@ -60,7 +60,7 @@ class AuthService {
         accessToken: response.data['access_token'] as String,
         refreshToken: response.data['refresh_token'] as String,
       );
-      return await me();
+      return User.fromJson(Map<String, dynamic>.from(response.data['user'] as Map));
     } catch (e) {
       await _storageService.deleteTokens();
       throw AuthException(_errorMessage(e, fallback: 'Registration failed'));
