@@ -7,7 +7,7 @@ class ServerService {
   ServerService(this._apiService);
 
   Future<List<ServerProfile>> getServers() async {
-    final response = await _apiService.dio.get('servers');
+    final response = await _apiService.dio.get('servers/');
     return (response.data as List)
         .map((e) => ServerProfile.fromJson(e))
         .toList();
@@ -22,13 +22,15 @@ class ServerService {
     required String passwordOrKey,
     required String projectPath,
   }) async {
-    await _apiService.dio.post('servers', data: {
+    await _apiService.dio.post('servers/', data: {
       'display_name': displayName,
       'host': host,
       'port': port,
       'username': username,
       'auth_type': authType,
-      'encrypted_credentials': passwordOrKey,
+      // Backend expects 'credentials' — it encrypts this field server-side.
+      // The old code sent 'encrypted_credentials' which is wrong.
+      'credentials': passwordOrKey,
       'project_path': projectPath,
     });
   }
