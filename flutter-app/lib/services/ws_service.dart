@@ -6,14 +6,22 @@ class WSService {
   WebSocketChannel? _aiChannel;
 
   void connectTerminal(String serverId, String token) {
+    final uri = Uri.parse(AppConfig.wsUrl).replace(
+      path: '${Uri.parse(AppConfig.wsUrl).path}/$serverId/terminal',
+      queryParameters: {'token': token},
+    );
     _terminalChannel = WebSocketChannel.connect(
-      Uri.parse('${AppConfig.wsUrl}/$serverId/terminal?token=$token'),
+      uri,
     );
   }
 
   void connectAI(String serverId, String token) {
+    final uri = Uri.parse(AppConfig.wsUrl).replace(
+      path: '${Uri.parse(AppConfig.wsUrl).path}/$serverId/ai',
+      queryParameters: {'token': token},
+    );
     _aiChannel = WebSocketChannel.connect(
-      Uri.parse('${AppConfig.wsUrl}/$serverId/ai?token=$token'),
+      uri,
     );
   }
 

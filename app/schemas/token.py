@@ -7,3 +7,6 @@ class Token(BaseModel):
 
 class TokenPayload(BaseModel):
     sub: Optional[int] = None
+    sid: Optional[str] = None
+    type: Optional[str] = None
+    jti: Optional[str] = None

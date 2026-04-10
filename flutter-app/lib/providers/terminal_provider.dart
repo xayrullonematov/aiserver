@@ -27,7 +27,7 @@ class TerminalNotifier extends _$TerminalNotifier {
   Future<void> connect() async {
     final ws = ref.read(wsServiceProvider);
     final storage = ref.read(storageServiceProvider);
-    final token = await storage.getToken();
+    final token = await storage.getAccessToken();
 
     if (token != null) {
       ws.connectTerminal(serverId, token);

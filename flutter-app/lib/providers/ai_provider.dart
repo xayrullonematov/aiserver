@@ -56,7 +56,7 @@ class AIChat extends _$AIChat {
 
     try {
       final api = ref.read(apiServiceProvider);
-      await api.dio.post('/ai/approve', data: {
+      await api.dio.post('ai/approve', data: {
         'server_id': serverId,
         'ai_response_id': currentProposal.id,
         'approved_commands': commands,
@@ -81,7 +81,7 @@ class AIChat extends _$AIChat {
 
     try {
       final api = ref.read(apiServiceProvider);
-      final response = await api.dio.post('/ai/chat', data: {
+      final response = await api.dio.post('ai/chat', data: {
         'prompt': text,
         'server_id': int.tryParse(serverId),
         'provider': provider,

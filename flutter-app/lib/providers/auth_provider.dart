@@ -29,7 +29,7 @@ class Auth extends _$Auth {
   @override
   FutureOr<User?> build() async {
     final service = ref.watch(authServiceProvider);
-    return await service.me();
+    return await service.loadCurrentUser();
   }
 
   Future<void> login(String email, String password) async {

@@ -32,7 +32,8 @@ class Settings(BaseSettings):
     
     # Auth
     SECRET_KEY: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 30
     
     # SSH Encryption
     ENCRYPTION_KEY: str  # Must be 32 bytes (base64 encoded) for AES-256

@@ -30,13 +30,14 @@ async def terminal_websocket(
     
     token = websocket.query_params.get("token")
     if not token:
+        logger.info("Terminal websocket rejected without token", extra={"server_id": server_id})
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 
     async with AsyncSessionLocal() as session:
         try:
             # Manually validate user from token
-            current_user = await deps.get_current_user(session, token)
+            current_user = await deps.get_user_from_access_token(session, token)
             
             # Verify server ownership
             result = await session.execute(
@@ -45,6 +46,7 @@ async def terminal_websocket(
             )
             server = result.scalar_one_or_none()
             if not server:
+                logger.warning("Terminal websocket rejected for unauthorized server", extra={"server_id": server_id, "user_id": current_user.id})
                 await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
                 return
 
@@ -118,12 +120,13 @@ async def ai_websocket(
     
     token = websocket.query_params.get("token")
     if not token:
+        logger.info("AI websocket rejected without token", extra={"server_id": server_id})
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 
     async with AsyncSessionLocal() as session:
         try:
-            current_user = await deps.get_current_user(session, token)
+            current_user = await deps.get_user_from_access_token(session, token)
             
             result = await session.execute(
                 select(ServerProfile)
@@ -131,6 +134,7 @@ async def ai_websocket(
             )
             server = result.scalar_one_or_none()
             if not server:
+                logger.warning("AI websocket rejected for unauthorized server", extra={"server_id": server_id, "user_id": current_user.id})
                 await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
                 return
 

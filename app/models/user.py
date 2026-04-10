@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from .server import ServerProfile
     from .session import SSHSession
     from .execution import ExecutionLog
+    from .auth_session import AuthSession
 
 
 class User(Base):
@@ -26,3 +27,7 @@ class User(Base):
     servers: Mapped[list["ServerProfile"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     sessions: Mapped[list["SSHSession"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     executions: Mapped[list["ExecutionLog"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    auth_sessions: Mapped[list["AuthSession"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )

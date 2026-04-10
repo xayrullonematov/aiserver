@@ -22,7 +22,7 @@ class SSHService {
 
   Future<List<dynamic>> listFiles(String serverId, String path) async {
     final response = await _apiService.dio.get(
-      '/ssh/$serverId/files',
+      'ssh/$serverId/files',
       queryParameters: {'path': path},
     );
     return response.data;
@@ -30,7 +30,7 @@ class SSHService {
 
   Future<String> readFile(String serverId, String path) async {
     final response = await _apiService.dio.get(
-      '/ssh/$serverId/file',
+      'ssh/$serverId/file',
       queryParameters: {'path': path},
     );
     return response.data['content'];
@@ -38,7 +38,7 @@ class SSHService {
 
   Future<void> writeFile(String serverId, String path, String content) async {
     await _apiService.dio.put(
-      '/ssh/$serverId/file',
+      'ssh/$serverId/file',
       data: {
         'path': path,
         'content': content,
