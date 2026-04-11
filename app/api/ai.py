@@ -42,9 +42,13 @@ async def ai_chat(
 ):
     context = None
     if request.server_id:
+        try:
+            server_id_int = int(request.server_id)
+        except (ValueError, TypeError):
+            raise HTTPException(status_code=400, detail="Invalid server_id")
         result = await session.execute(
             select(ServerProfile)
-            .where(ServerProfile.id == request.server_id, ServerProfile.user_id == current_user.id)
+            .where(ServerProfile.id == server_id_int, ServerProfile.user_id == current_user.id)
         )
         server = result.scalar_one_or_none()
         if not server:
@@ -108,9 +112,13 @@ async def approve_changes(
     proposal = pending_responses.pop(request.ai_response_id)
     
     # Verify server access
+    try:
+        server_id_int = int(request.server_id)
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=400, detail="Invalid server_id")
     result = await session.execute(
         select(ServerProfile)
-        .where(ServerProfile.id == request.server_id, ServerProfile.user_id == current_user.id)
+        .where(ServerProfile.id == server_id_int, ServerProfile.user_id == current_user.id)
     )
     server = result.scalar_one_or_none()
     if not server:

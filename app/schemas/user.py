@@ -22,11 +22,16 @@ class UserCreate(UserBase):
     password: str
 
 class UserPublic(UserBase):
-    id: int
+    id: str
     created_at: datetime
 
     class Config:
         from_attributes = True
+
+    @field_validator("id", mode="before")
+    @classmethod
+    def coerce_id_to_str(cls, v: object) -> str:
+        return str(v)
 
 class UserLogin(BaseModel):
     email: str

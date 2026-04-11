@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 class ServerProfileBase(BaseModel):
     display_name: str
@@ -14,13 +14,18 @@ class ServerProfileCreate(ServerProfileBase):
     credentials: str  # Plain password or private key, will be encrypted before storage
 
 class ServerProfilePublic(ServerProfileBase):
-    id: int
-    user_id: int
+    id: str
+    user_id: str
     last_connected: Optional[datetime] = None
     created_at: datetime
 
     class Config:
         from_attributes = True
+
+    @field_validator("id", "user_id", mode="before")
+    @classmethod
+    def coerce_id_to_str(cls, v: object) -> str:
+        return str(v)
 
 class ServerTestRequest(BaseModel):
     host: str

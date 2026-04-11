@@ -3,7 +3,7 @@ from typing import List, Optional, Dict
 
 class AIChatRequest(BaseModel):
     prompt: str
-    server_id: Optional[int] = None
+    server_id: Optional[str] = None
     provider: str = "openai"
     api_key: str
     model: Optional[str] = None
