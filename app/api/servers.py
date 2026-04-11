@@ -5,11 +5,13 @@ from sqlalchemy import select
 from app.core import deps
 from app.core import security
 from app.models.server import ServerProfile
+from app.models.execution import ExecutionLog
 from app.schemas.server import (
     ServerProfileCreate, 
     ServerProfilePublic, 
     ServerTestRequest
 )
+from app.schemas.execution import ExecutionLogPublic
 from app.services.ssh_manager import ssh_manager
 
 router = APIRouter(prefix="/servers", tags=["servers"])
@@ -152,3 +154,63 @@ async def test_server_new(
         return {"status": "success", "message": "Connection successful"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+
+@router.get("/{id}/logs", response_model=List[ExecutionLogPublic])
+async def get_server_logs(
+    id: int,
+    session: deps.SessionDep,
+    current_user: deps.CurrentUser,
+    skip: int = 0,
+    limit: int = 50,
+) -> Any:
+    """
+    Get execution logs for a server (most recent first).
+    """
+    result = await session.execute(
+        select(ServerProfile)
+        .where(ServerProfile.id == id, ServerProfile.user_id == current_user.id)
+    )
+    if not result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Server not found")
+
+    logs_result = await session.execute(
+        select(ExecutionLog)
+        .where(ExecutionLog.server_id == id, ExecutionLog.user_id == current_user.id)
+        .order_by(ExecutionLog.executed_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+    return logs_result.scalars().all()
+
+
+@router.get("/{id}/metrics")
+async def get_server_metrics(
+    id: int,
+    session: deps.SessionDep,
+    current_user: deps.CurrentUser,
+) -> Any:
+    """
+    Get real-time CPU and RAM metrics via SSH.
+    Returns zeros if server is not connected.
+    """
+    result = await session.execute(
+        select(ServerProfile)
+        .where(ServerProfile.id == id, ServerProfile.user_id == current_user.id)
+    )
+    server = result.scalar_one_or_none()
+    if not server:
+        raise HTTPException(status_code=404, detail="Server not found")
+
+    try:
+        command = "top -bn1 | grep 'Cpu(s)' | awk '{print $2}'; free -m | grep Mem | awk '{print $3/$2 * 100.0}'"
+        lines = []
+        async for line in ssh_manager.execute(id, command):
+            stripped = line.strip()
+            if stripped:
+                lines.append(stripped)
+        cpu = float(lines[0]) if len(lines) > 0 else 0.0
+        ram = float(lines[1]) if len(lines) > 1 else 0.0
+        return {"cpu": cpu, "ram": ram}
+    except Exception:
+        return {"cpu": 0.0, "ram": 0.0}

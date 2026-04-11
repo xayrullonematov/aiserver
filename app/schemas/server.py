@@ -27,6 +27,11 @@ class ServerProfilePublic(ServerProfileBase):
     def coerce_id_to_str(cls, v: object) -> str:
         return str(v)
 
+    @field_validator("project_path", mode="before")
+    @classmethod
+    def coerce_project_path(cls, v: object) -> str:
+        return str(v) if v is not None else ""
+
 class ServerTestRequest(BaseModel):
     host: str
     port: int = 22
