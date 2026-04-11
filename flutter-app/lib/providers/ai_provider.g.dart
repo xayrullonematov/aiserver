@@ -6,7 +6,7 @@ part of 'ai_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$aiServiceHash() => r'bfa7298289ef29e50761416c6a1f590c9887613a';
+String _$aiServiceHash() => r'c7362c7a7b1da9d216f52d07deebbb112896d88a';
 
 /// See also [aiService].
 @ProviderFor(aiService)
@@ -22,7 +22,7 @@ final aiServiceProvider = Provider<AIService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AiServiceRef = ProviderRef<AIService>;
-String _$aIChatHash() => r'fa1c48d236a31a3ccab7b09844d76d0ed040f636';
+String _$aIChatHash() => r'3e9a18421235efe51da672f8f1d8d772e6bbbdf5';
 
 /// Copied from Dart SDK
 class _SystemHash {

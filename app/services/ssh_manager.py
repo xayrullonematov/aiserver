@@ -35,6 +35,10 @@ class SSHManager:
         """Connect to a remote server and store in pool."""
         server_id = profile.id
         self._profiles[server_id] = profile
+
+        existing_conn = self._connections.get(server_id)
+        if existing_conn is not None and not existing_conn.is_closing():
+            return existing_conn
         
         # Decrypt credentials
         secret = decrypt_credentials(profile.encrypted_credentials)

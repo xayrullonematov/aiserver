@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ai_server_copilot/providers/server_provider.dart';
+import 'package:ai_server_copilot/services/server_service.dart';
 
 class ServerDashboardScreen extends ConsumerWidget {
   final String serverId;
@@ -10,6 +11,7 @@ class ServerDashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final connectionAsync = ref.watch(serverConnectionStatusProvider(serverId));
     final metricsAsync = ref.watch(serverMetricsProvider(serverId));
 
     return Scaffold(
@@ -17,7 +19,13 @@ class ServerDashboardScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          _buildStatusCard(context),
+          _buildStatusCard(
+            context,
+            connectionAsync,
+            () => ref
+                .read(serverConnectionStatusProvider(serverId).notifier)
+                .refresh(),
+          ),
           const SizedBox(height: 16),
           _buildQuickActions(context),
           const SizedBox(height: 24),
@@ -40,10 +48,12 @@ class ServerDashboardScreen extends ConsumerWidget {
                 ),
               ],
             ),
-            loading: () => const Center(child: Padding(
-              padding: EdgeInsets.all(24.0),
-              child: CircularProgressIndicator(),
-            )),
+            loading: () => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24.0),
+                child: CircularProgressIndicator(),
+              ),
+            ),
             error: (err, stack) => Text('Error loading metrics: $err'),
           ),
         ],
@@ -51,7 +61,12 @@ class ServerDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMetricRow(BuildContext context, String label, double value, Color color) {
+  Widget _buildMetricRow(
+    BuildContext context,
+    String label,
+    double value,
+    Color color,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -59,13 +74,16 @@ class ServerDashboardScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
-            Text('${value.toStringAsFixed(1)}%', style: TextStyle(color: color, fontWeight: FontWeight.bold)),
+            Text(
+              '${value.toStringAsFixed(1)}%',
+              style: TextStyle(color: color, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
         const SizedBox(height: 8),
         LinearProgressIndicator(
-          value: value / 100,
-          backgroundColor: color.withOpacity(0.1),
+          value: (value / 100).clamp(0.0, 1.0),
+          backgroundColor: color.withValues(alpha: 0.1),
           valueColor: AlwaysStoppedAnimation<Color>(color),
           minHeight: 8,
           borderRadius: BorderRadius.circular(4),
@@ -74,7 +92,34 @@ class ServerDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatusCard(BuildContext context) {
+  Widget _buildStatusCard(
+    BuildContext context,
+    AsyncValue<ServerConnectionResult> connectionAsync,
+    VoidCallback onRetry,
+  ) {
+    final status = connectionAsync.when(
+      data: (connection) => _ConnectionStatusCardData(
+        color: connection.isConnected ? Colors.green : Colors.red,
+        title: connection.isConnected
+            ? 'Connection successful'
+            : 'Connection failed',
+        subtitle: connection.message,
+        showRetry: !connection.isConnected,
+      ),
+      loading: () => const _ConnectionStatusCardData(
+        color: Colors.orange,
+        title: 'Testing connection...',
+        subtitle: 'Waiting for backend connection test',
+        showRetry: false,
+      ),
+      error: (err, stack) => _ConnectionStatusCardData(
+        color: Colors.red,
+        title: 'Connection failed',
+        subtitle: err.toString(),
+        showRetry: true,
+      ),
+    );
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -83,16 +128,20 @@ class ServerDashboardScreen extends ConsumerWidget {
           children: [
             Row(
               children: [
-                const CircleAvatar(
-                  backgroundColor: Colors.green,
-                  radius: 6,
-                ),
+                CircleAvatar(backgroundColor: status.color, radius: 6),
                 const SizedBox(width: 8),
-                Text('SSH Connected', style: Theme.of(context).textTheme.titleMedium),
+                Expanded(
+                  child: Text(
+                    status.title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                if (status.showRetry)
+                  TextButton(onPressed: onRetry, child: const Text('Retry')),
               ],
             ),
             const SizedBox(height: 8),
-            const Text('Real-time monitoring active'),
+            Text(status.subtitle),
           ],
         ),
       ),
@@ -131,10 +180,26 @@ class ServerDashboardScreen extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+        style: Theme.of(
+          context,
+        ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
       ),
     );
   }
+}
+
+class _ConnectionStatusCardData {
+  final Color color;
+  final String title;
+  final String subtitle;
+  final bool showRetry;
+
+  const _ConnectionStatusCardData({
+    required this.color,
+    required this.title,
+    required this.subtitle,
+    required this.showRetry,
+  });
 }
 
 class _ActionItem extends StatelessWidget {
@@ -142,7 +207,11 @@ class _ActionItem extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _ActionItem({required this.icon, required this.label, required this.onTap});
+  const _ActionItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {

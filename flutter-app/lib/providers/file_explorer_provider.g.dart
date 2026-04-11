@@ -6,7 +6,7 @@ part of 'file_explorer_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sshServiceHash() => r'611be0e5cbe16c14b4e14d837e1b7ed64f41c401';
+String _$sshServiceHash() => r'cc92d7e02a731b12d2b54d7d2d4947c88dab00e1';
 
 /// See also [sshService].
 @ProviderFor(sshService)
@@ -22,8 +22,7 @@ final sshServiceProvider = Provider<SSHService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef SshServiceRef = ProviderRef<SSHService>;
-String _$fileExplorerNotifierHash() =>
-    r'0abbf903a8d8f355b386faaeb9c1205211cde4f7';
+String _$explorerRootPathHash() => r'1dc6be383af7e2fe4016fedceffe59597fb90c7e';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -45,6 +44,137 @@ class _SystemHash {
     return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
   }
 }
+
+/// See also [explorerRootPath].
+@ProviderFor(explorerRootPath)
+const explorerRootPathProvider = ExplorerRootPathFamily();
+
+/// See also [explorerRootPath].
+class ExplorerRootPathFamily extends Family<String> {
+  /// See also [explorerRootPath].
+  const ExplorerRootPathFamily();
+
+  /// See also [explorerRootPath].
+  ExplorerRootPathProvider call(
+    String serverId,
+  ) {
+    return ExplorerRootPathProvider(
+      serverId,
+    );
+  }
+
+  @override
+  ExplorerRootPathProvider getProviderOverride(
+    covariant ExplorerRootPathProvider provider,
+  ) {
+    return call(
+      provider.serverId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'explorerRootPathProvider';
+}
+
+/// See also [explorerRootPath].
+class ExplorerRootPathProvider extends AutoDisposeProvider<String> {
+  /// See also [explorerRootPath].
+  ExplorerRootPathProvider(
+    String serverId,
+  ) : this._internal(
+          (ref) => explorerRootPath(
+            ref as ExplorerRootPathRef,
+            serverId,
+          ),
+          from: explorerRootPathProvider,
+          name: r'explorerRootPathProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$explorerRootPathHash,
+          dependencies: ExplorerRootPathFamily._dependencies,
+          allTransitiveDependencies:
+              ExplorerRootPathFamily._allTransitiveDependencies,
+          serverId: serverId,
+        );
+
+  ExplorerRootPathProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.serverId,
+  }) : super.internal();
+
+  final String serverId;
+
+  @override
+  Override overrideWith(
+    String Function(ExplorerRootPathRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: ExplorerRootPathProvider._internal(
+        (ref) => create(ref as ExplorerRootPathRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        serverId: serverId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeProviderElement<String> createElement() {
+    return _ExplorerRootPathProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ExplorerRootPathProvider && other.serverId == serverId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, serverId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin ExplorerRootPathRef on AutoDisposeProviderRef<String> {
+  /// The parameter `serverId` of this provider.
+  String get serverId;
+}
+
+class _ExplorerRootPathProviderElement
+    extends AutoDisposeProviderElement<String> with ExplorerRootPathRef {
+  _ExplorerRootPathProviderElement(super.provider);
+
+  @override
+  String get serverId => (origin as ExplorerRootPathProvider).serverId;
+}
+
+String _$fileExplorerNotifierHash() =>
+    r'0abbf903a8d8f355b386faaeb9c1205211cde4f7';
 
 abstract class _$FileExplorerNotifier
     extends BuildlessAutoDisposeAsyncNotifier<List<dynamic>> {
@@ -214,7 +344,7 @@ class _FileExplorerNotifierProviderElement
   String get path => (origin as FileExplorerNotifierProvider).path;
 }
 
-String _$currentPathHash() => r'aa6887a77f3c21c4d6759f8438c37e63ccf4f9e9';
+String _$currentPathHash() => r'5f9f402d7ce43c4a1c96d9735efcf56e149ab33d';
 
 abstract class _$CurrentPath extends BuildlessAutoDisposeNotifier<String> {
   late final String serverId;

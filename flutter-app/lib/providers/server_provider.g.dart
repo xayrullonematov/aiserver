@@ -23,7 +23,7 @@ final serverServiceProvider = Provider<ServerService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ServerServiceRef = ProviderRef<ServerService>;
-String _$serverMetricsHash() => r'49f5ca9a56304534d27ec59cf186f5beeee272c3';
+String _$serverMetricsHash() => r'654ece1b8f6eb9272a8f7f61941c45f98c8deb4f';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -176,7 +176,7 @@ class _ServerMetricsProviderElement
   String get serverId => (origin as ServerMetricsProvider).serverId;
 }
 
-String _$serversHash() => r'98e3e3204b9738dc1c614c0f3382a15f84e23d24';
+String _$serversHash() => r'157b4aa531142568217585f12a2d401b1f32118f';
 
 /// See also [Servers].
 @ProviderFor(Servers)
@@ -191,5 +191,155 @@ final serversProvider =
 );
 
 typedef _$Servers = AutoDisposeAsyncNotifier<List<ServerProfile>>;
+String _$serverConnectionStatusHash() =>
+    r'd85d247f0e54dca4e0df427da5e50d05f84296f3';
+
+abstract class _$ServerConnectionStatus
+    extends BuildlessAutoDisposeAsyncNotifier<ServerConnectionResult> {
+  late final String serverId;
+
+  FutureOr<ServerConnectionResult> build(
+    String serverId,
+  );
+}
+
+/// See also [ServerConnectionStatus].
+@ProviderFor(ServerConnectionStatus)
+const serverConnectionStatusProvider = ServerConnectionStatusFamily();
+
+/// See also [ServerConnectionStatus].
+class ServerConnectionStatusFamily
+    extends Family<AsyncValue<ServerConnectionResult>> {
+  /// See also [ServerConnectionStatus].
+  const ServerConnectionStatusFamily();
+
+  /// See also [ServerConnectionStatus].
+  ServerConnectionStatusProvider call(
+    String serverId,
+  ) {
+    return ServerConnectionStatusProvider(
+      serverId,
+    );
+  }
+
+  @override
+  ServerConnectionStatusProvider getProviderOverride(
+    covariant ServerConnectionStatusProvider provider,
+  ) {
+    return call(
+      provider.serverId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'serverConnectionStatusProvider';
+}
+
+/// See also [ServerConnectionStatus].
+class ServerConnectionStatusProvider
+    extends AutoDisposeAsyncNotifierProviderImpl<ServerConnectionStatus,
+        ServerConnectionResult> {
+  /// See also [ServerConnectionStatus].
+  ServerConnectionStatusProvider(
+    String serverId,
+  ) : this._internal(
+          () => ServerConnectionStatus()..serverId = serverId,
+          from: serverConnectionStatusProvider,
+          name: r'serverConnectionStatusProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$serverConnectionStatusHash,
+          dependencies: ServerConnectionStatusFamily._dependencies,
+          allTransitiveDependencies:
+              ServerConnectionStatusFamily._allTransitiveDependencies,
+          serverId: serverId,
+        );
+
+  ServerConnectionStatusProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.serverId,
+  }) : super.internal();
+
+  final String serverId;
+
+  @override
+  FutureOr<ServerConnectionResult> runNotifierBuild(
+    covariant ServerConnectionStatus notifier,
+  ) {
+    return notifier.build(
+      serverId,
+    );
+  }
+
+  @override
+  Override overrideWith(ServerConnectionStatus Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: ServerConnectionStatusProvider._internal(
+        () => create()..serverId = serverId,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        serverId: serverId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeAsyncNotifierProviderElement<ServerConnectionStatus,
+      ServerConnectionResult> createElement() {
+    return _ServerConnectionStatusProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ServerConnectionStatusProvider &&
+        other.serverId == serverId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, serverId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin ServerConnectionStatusRef
+    on AutoDisposeAsyncNotifierProviderRef<ServerConnectionResult> {
+  /// The parameter `serverId` of this provider.
+  String get serverId;
+}
+
+class _ServerConnectionStatusProviderElement
+    extends AutoDisposeAsyncNotifierProviderElement<ServerConnectionStatus,
+        ServerConnectionResult> with ServerConnectionStatusRef {
+  _ServerConnectionStatusProviderElement(super.provider);
+
+  @override
+  String get serverId => (origin as ServerConnectionStatusProvider).serverId;
+}
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

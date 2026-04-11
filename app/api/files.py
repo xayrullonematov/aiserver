@@ -31,7 +31,9 @@ async def get_file_tree(
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
     
-    target_path = path or server.project_path or "."
+    target_path = path
+    if not target_path or target_path == ".":
+        target_path = server.project_path or "/"
     try:
         tree = await file_manager.get_file_tree(server_id, target_path, max_depth=depth)
         return tree

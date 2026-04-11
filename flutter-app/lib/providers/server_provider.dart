@@ -29,7 +29,7 @@ class Servers extends _$Servers {
     });
   }
 
-  Future<void> addServer({
+  Future<ServerSaveResult> addServer({
     required String displayName,
     required String host,
     required int port,
@@ -38,10 +38,11 @@ class Servers extends _$Servers {
     required String passwordOrKey,
     required String projectPath,
   }) async {
+    final service = ref.read(serverServiceProvider);
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final service = ref.read(serverServiceProvider);
-      await service.addServer(
+
+    try {
+      final server = await service.addServer(
         displayName: displayName,
         host: host,
         port: port,
@@ -50,8 +51,17 @@ class Servers extends _$Servers {
         passwordOrKey: passwordOrKey,
         projectPath: projectPath,
       );
-      return await service.getServers();
-    });
+      final servers = await service.getServers();
+      state = AsyncValue.data(servers);
+
+      final connection = await service.testServer(server.id);
+      ref.invalidate(serverConnectionStatusProvider(server.id));
+
+      return ServerSaveResult(server: server, connection: connection);
+    } catch (e, stackTrace) {
+      state = AsyncValue.error(e, stackTrace);
+      rethrow;
+    }
   }
 
   Future<void> deleteServer(String id) async {
@@ -65,8 +75,30 @@ class Servers extends _$Servers {
 }
 
 @riverpod
-Stream<Map<String, double>> serverMetrics(ServerMetricsRef ref, String serverId) async* {
-  final service = ref.watch(serverServiceProvider); // ✅ Fixed: sshServiceProvider → serverServiceProvider
+class ServerConnectionStatus extends _$ServerConnectionStatus {
+  @override
+  FutureOr<ServerConnectionResult> build(String serverId) async {
+    final service = ref.watch(serverServiceProvider);
+    return await service.testServer(serverId);
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final service = ref.read(serverServiceProvider);
+      return await service.testServer(serverId);
+    });
+  }
+}
+
+@riverpod
+Stream<Map<String, double>> serverMetrics(
+  ServerMetricsRef ref,
+  String serverId,
+) async* {
+  final service = ref.watch(
+    serverServiceProvider,
+  ); // ✅ Fixed: sshServiceProvider → serverServiceProvider
 
   while (true) {
     try {

@@ -35,7 +35,9 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     try {
-      await ref.read(serversProvider.notifier).addServer(
+      final result = await ref
+          .read(serversProvider.notifier)
+          .addServer(
             displayName: _displayNameController.text,
             host: _hostController.text,
             port: int.parse(_portController.text),
@@ -44,12 +46,22 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
             passwordOrKey: _passwordController.text,
             projectPath: _projectPathController.text,
           );
-      if (mounted) context.pop();
+      if (!mounted) return;
+
+      final message =
+          result.connection.isConnected
+              ? 'Server saved and SSH connection succeeded.'
+              : 'Server saved, but SSH connection failed: ${result.connection.message}';
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+      context.go('/server/${result.server.id}');
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add server: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to add server: $e')));
       }
     }
   }
@@ -67,32 +79,47 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
           children: [
             TextFormField(
               controller: _displayNameController,
-              decoration: const InputDecoration(labelText: 'Display Name', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: 'Display Name',
+                border: OutlineInputBorder(),
+              ),
               validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _hostController,
-              decoration: const InputDecoration(labelText: 'Host (IP or Domain)', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: 'Host (IP or Domain)',
+                border: OutlineInputBorder(),
+              ),
               validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _portController,
-              decoration: const InputDecoration(labelText: 'Port', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: 'Port',
+                border: OutlineInputBorder(),
+              ),
               keyboardType: TextInputType.number,
               validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _usernameController,
-              decoration: const InputDecoration(labelText: 'Username', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: 'Username',
+                border: OutlineInputBorder(),
+              ),
               validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               value: _authType,
-              decoration: const InputDecoration(labelText: 'Auth Type', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: 'Auth Type',
+                border: OutlineInputBorder(),
+              ),
               items: const [
                 DropdownMenuItem(value: 'password', child: Text('Password')),
                 DropdownMenuItem(value: 'key', child: Text('Private Key')),
@@ -103,7 +130,10 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
             TextFormField(
               controller: _passwordController,
               decoration: InputDecoration(
-                labelText: _authType == 'password' ? 'Password' : 'Private Key Content',
+                labelText:
+                    _authType == 'password'
+                        ? 'Password'
+                        : 'Private Key Content',
                 border: const OutlineInputBorder(),
               ),
               obscureText: _authType == 'password',
@@ -113,7 +143,10 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _projectPathController,
-              decoration: const InputDecoration(labelText: 'Project Path', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: 'Project Path',
+                border: OutlineInputBorder(),
+              ),
               validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
             ),
             const SizedBox(height: 32),
@@ -121,9 +154,10 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
               height: 56,
               child: ElevatedButton(
                 onPressed: serversState.isLoading ? null : _submit,
-                child: serversState.isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text('Connect & Save'),
+                child:
+                    serversState.isLoading
+                        ? const CircularProgressIndicator()
+                        : const Text('Save & Test'),
               ),
             ),
           ],

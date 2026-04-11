@@ -138,7 +138,9 @@ async def list_files(
     List directory contents.
     """
     server = await get_server_for_user(server_id, session, current_user)
-    target_path = path or server.project_path or "."
+    target_path = path
+    if not target_path or target_path == ".":
+        target_path = server.project_path or "/"
     try:
         files = await file_manager.list_directory(server_id, target_path)
         return files

@@ -6,7 +6,7 @@ part of 'terminal_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$wsServiceHash() => r'efbb9c9888f2d4dd0cbe23238c6cac6e6d772171';
+String _$wsServiceHash() => r'206c4c3ad1b04451e6556b6eaf9aa84a5368b924';
 
 /// See also [wsService].
 @ProviderFor(wsService)
@@ -22,7 +22,7 @@ final wsServiceProvider = Provider<WSService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef WsServiceRef = ProviderRef<WSService>;
-String _$terminalNotifierHash() => r'64afc59dc237f02e0b7d301a40c10eefd5486abe';
+String _$terminalNotifierHash() => r'a3553956130ec68bb7bd5f391bf6ca6125bd74e2';
 
 /// Copied from Dart SDK
 class _SystemHash {
